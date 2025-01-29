@@ -2,6 +2,7 @@ package com.vadhara7.marketwebsocket.di
 
 
 import com.vadhara7.marketwebsocket.core.data.networking.HttpClientFactory
+import com.vadhara7.marketwebsocket.core.data.networking.WebSocketClient
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
 import com.vadhara7.marketwebsocket.crypto.data.networking.RemoteCoinDataSource
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.CoinListViewModel
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { HttpClientFactory.create(CIO.create()) }
+    single { WebSocketClient(get()) }
     singleOf(::RemoteCoinDataSource).bind<CoinDataSource>()
 
     viewModelOf(::CoinListViewModel)

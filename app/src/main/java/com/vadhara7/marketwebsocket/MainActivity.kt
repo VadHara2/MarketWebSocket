@@ -33,6 +33,9 @@ class MainActivity : ComponentActivity() {
                     val viewModel = koinViewModel<CoinListViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
                     val context = LocalContext.current
+
+                    lifecycle.addObserver(viewModel)
+
                     ObserveAsEvents(events = viewModel.events) { event ->
                         when(event) {
                             is CoinListEvent.Error -> {
@@ -51,5 +54,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }

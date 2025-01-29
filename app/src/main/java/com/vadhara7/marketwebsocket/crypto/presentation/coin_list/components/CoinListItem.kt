@@ -1,4 +1,4 @@
-package com.books.marketwebsocket.crypto.presentation.coin_list.components
+package com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.books.marketwebsocket.crypto.domain.Coin
-import com.books.marketwebsocket.crypto.presentation.models.CoinUi
-import com.books.marketwebsocket.crypto.presentation.models.toCoinUi
-import com.books.marketwebsocket.ui.theme.MarketWebSocketTheme
+import com.vadhara7.marketwebsocket.crypto.domain.Coin
+import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
+import com.vadhara7.marketwebsocket.crypto.presentation.models.toCoinUi
+import com.vadhara7.marketwebsocket.ui.theme.MarketWebSocketTheme
 
 @Composable
 fun CoinListItem(

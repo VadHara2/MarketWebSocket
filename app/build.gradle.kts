@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.books.marketwebsocket"
+    namespace = "com.vadhara7.marketwebsocket"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.books.marketwebsocket"
+        applicationId = "com.vadhara7.marketwebsocket"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

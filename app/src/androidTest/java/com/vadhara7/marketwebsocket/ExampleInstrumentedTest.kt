@@ -1,4 +1,4 @@
-package com.books.marketwebsocket
+package com.vadhara7.marketwebsocket
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.books.marketwebsocket.crypto.domain
+package com.vadhara7.marketwebsocket.crypto.domain
 
 data class Coin(
     val id: String,

@@ -1,9 +1,9 @@
-package com.books.marketwebsocket.crypto.presentation.models
+package com.vadhara7.marketwebsocket.crypto.presentation.models
 
 import android.icu.text.NumberFormat
 import androidx.annotation.DrawableRes
-import com.books.marketwebsocket.crypto.domain.Coin
-import com.books.marketwebsocket.util.getDrawableIdForCoin
+import com.vadhara7.marketwebsocket.crypto.domain.Coin
+import com.vadhara7.marketwebsocket.util.getDrawableIdForCoin
 import java.util.Locale
 
 data class CoinUi(

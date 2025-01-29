@@ -1,7 +1,7 @@
-package com.books.marketwebsocket.crypto.presentation.coin_list
+package com.vadhara7.marketwebsocket.crypto.presentation.coin_list
 
 import androidx.compose.runtime.Immutable
-import com.books.marketwebsocket.crypto.presentation.models.CoinUi
+import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
 
 @Immutable
 data class CoinListState(

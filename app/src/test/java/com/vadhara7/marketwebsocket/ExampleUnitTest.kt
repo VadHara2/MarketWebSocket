@@ -1,4 +1,4 @@
-package com.books.marketwebsocket
+package com.vadhara7.marketwebsocket
 
 import org.junit.Test
 

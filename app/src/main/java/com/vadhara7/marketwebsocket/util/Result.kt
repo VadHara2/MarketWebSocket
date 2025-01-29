@@ -1,4 +1,4 @@
-package com.books.marketwebsocket.util
+package com.vadhara7.marketwebsocket.util
 
 typealias DomainError = Error
 

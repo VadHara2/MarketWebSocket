@@ -1,6 +1,6 @@
-package com.books.marketwebsocket.util
+package com.vadhara7.marketwebsocket.util
 
-import com.books.marketwebsocket.R
+import com.vadhara7.marketwebsocket.R
 
 
 fun getDrawableIdForCoin(symbol: String): Int {

@@ -1,4 +1,4 @@
-package com.books.marketwebsocket.ui.theme
+package com.vadhara7.marketwebsocket.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

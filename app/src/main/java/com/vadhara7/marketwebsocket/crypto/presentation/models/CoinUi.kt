@@ -3,7 +3,7 @@ package com.vadhara7.marketwebsocket.crypto.presentation.models
 import android.icu.text.NumberFormat
 import androidx.annotation.DrawableRes
 import com.vadhara7.marketwebsocket.crypto.domain.Coin
-import com.vadhara7.marketwebsocket.util.getDrawableIdForCoin
+import com.vadhara7.marketwebsocket.core.presentation.util.getDrawableIdForCoin
 import java.util.Locale
 
 data class CoinUi(

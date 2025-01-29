@@ -1,4 +1,4 @@
-package com.vadhara7.marketwebsocket.util
+package com.vadhara7.marketwebsocket.core.presentation.util
 
 import com.vadhara7.marketwebsocket.R
 

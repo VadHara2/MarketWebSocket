@@ -1,5 +1,6 @@
 package com.vadhara7.marketwebsocket.core.data.networking
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
@@ -18,6 +19,19 @@ class WebSocketClient(private val client: HttpClient) {
 
     fun observePrices(): Flow<Map<String, String>> = flow {
         client.webSocket(method = HttpMethod.Get, host = "ws.coincap.io", path = "/prices?assets=ALL") {
+            webSocketSession = this
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    val data = frame.readText()
+                    val priceMap: Map<String, String> = Json.decodeFromString(data)
+                    emit(priceMap)
+                }
+            }
+        }
+    }
+
+    fun observeCoin(coinId: String): Flow<Map<String, String>> = flow {
+        client.webSocket(method = HttpMethod.Get, host = "ws.coincap.io", path = "/prices?assets=$coinId") {
             webSocketSession = this
             for (frame in incoming) {
                 if (frame is Frame.Text) {

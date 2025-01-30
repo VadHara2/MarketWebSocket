@@ -60,7 +60,7 @@ fun CoinDetailScreen(
             CircularProgressIndicator()
         }
     } else if(state.selectedCoin != null) {
-        val coin = state.coins.find { it.id == state.selectedCoin.id } ?: state.selectedCoin
+        val coin = state.selectedCoin
         Column(
             modifier = modifier
                 .fillMaxSize()

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vadhara7.marketwebsocket.MainActivity
 import com.vadhara7.marketwebsocket.core.presentation.util.ObserveAsEvents
 import com.vadhara7.marketwebsocket.core.presentation.util.toString
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.CoinDetailScreen
@@ -45,6 +46,10 @@ fun AdaptiveCoinListDetailPane(
                     Toast.LENGTH_LONG
                 ).show()
             }
+
+            is CoinListEvent.StartServiceEvent -> {
+                (context as? MainActivity)?.requestNotificationPermissionOrStartService()
+            }
         }
     }
 
@@ -66,7 +71,7 @@ fun AdaptiveCoinListDetailPane(
                                     pane = ListDetailPaneScaffoldRole.Detail
                                 )
                             }
-                            else -> { }
+                            else -> {}
                         }
                     }
                 )
@@ -74,9 +79,10 @@ fun AdaptiveCoinListDetailPane(
         },
         detailPane = {
             AnimatedPane {
-                CoinDetailScreen(state = state, onAction = { action ->
-                    viewModel.onAction(action)
-                })
+                CoinDetailScreen(
+                    state = state,
+                    onAction = { action -> viewModel.onAction(action) }
+                )
             }
         },
         modifier = modifier

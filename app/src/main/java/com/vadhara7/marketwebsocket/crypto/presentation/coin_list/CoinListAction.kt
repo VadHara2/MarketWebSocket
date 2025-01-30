@@ -8,4 +8,5 @@ sealed interface CoinListAction {
     data class OnIntervalChange(val newInterval: Int): CoinListAction
     data class OnFilterSelect(val filter: CoinFilter): CoinListAction
     data class ToggleFavorite(val coinId: String) : CoinListAction
+    data object StartMonitoringService : CoinListAction
 }

@@ -48,7 +48,7 @@ class CoinListViewModel(
     private var historyJob: Job? = null
 
     fun onAction(action: CoinListAction) {
-        when (action ) {
+        when (action) {
             is CoinListAction.OnCoinClick -> selectCoin(action.coinUi)
             is CoinListAction.OnIntervalChange -> {
                 _state.update {
@@ -68,6 +68,11 @@ class CoinListViewModel(
                     )
                 }
                 toggleFavoriteCoin(action.coinId)
+            }
+            is CoinListAction.StartMonitoringService -> {
+                viewModelScope.launch {
+                    _events.send(CoinListEvent.StartServiceEvent)
+                }
             }
         }
     }

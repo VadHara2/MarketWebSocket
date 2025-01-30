@@ -4,4 +4,5 @@ import com.vadhara7.marketwebsocket.core.domain.util.NetworkError
 
 sealed interface CoinListEvent {
     data class Error(val error: NetworkError): CoinListEvent
+    data object StartServiceEvent : CoinListEvent
 }

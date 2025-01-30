@@ -12,4 +12,10 @@
     <string name="refresh_interval">Refresh: %1$d s</string>
     <string name="interval_sec">%1$d sec</string>
     <string name="filter">Filter: %1$s</string>
+    <string name="monitoring_favorite_coins">Monitoring favorite coins</string>
+    <string name="service_is_running">Service is running…</string>
+    <string name="price_alert_title">Price Alert: %1$s</string>
+    <string name="price_alert_text">%1$s changed by %2$.2f%% in the last hour!</string>
+    <string name="price_monitoring_channel_name">Price Monitoring</string>
+    <string name="price_monitoring_channel_description">Channel for price change notifications</string>
 </resources>

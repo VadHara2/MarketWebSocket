@@ -18,7 +18,8 @@ data class CoinUi(
     val priceUsd: DisplayableNumber,
     val changePercent24Hr: DisplayableNumber,
     @DrawableRes val iconRes: Int,
-    val coinPriceHistory: List<CoinPrice> = emptyList()
+    val coinPriceHistory: List<CoinPrice> = emptyList(),
+    val isFavorite: Boolean = false
 )
 
 data class DisplayableNumber(

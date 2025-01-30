@@ -9,6 +9,7 @@ import com.vadhara7.marketwebsocket.core.domain.util.onError
 import com.vadhara7.marketwebsocket.core.domain.util.onSuccess
 import com.vadhara7.marketwebsocket.core.presentation.util.CoinFilter
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
+import com.vadhara7.marketwebsocket.crypto.domain.FavoritesRepository
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinPrice
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
 import com.vadhara7.marketwebsocket.crypto.presentation.models.toCoinUi
@@ -27,7 +28,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class CoinListViewModel(
-    private val coinDataSource: CoinDataSource
+    private val coinDataSource: CoinDataSource,
+    private val favoritesRepository: FavoritesRepository
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _state = MutableStateFlow(CoinListState())
@@ -59,6 +61,14 @@ class CoinListViewModel(
                     it.copy(selectedFilter = action.filter, coins = it.coins.applyFilters(action.filter))
                 }
             }
+            is CoinListAction.ToggleFavorite -> {
+                _state.update {
+                    it.copy(
+                        selectedCoin = it.selectedCoin?.copy(isFavorite = !it.selectedCoin.isFavorite)
+                    )
+                }
+                toggleFavoriteCoin(action.coinId)
+            }
         }
     }
 
@@ -73,19 +83,25 @@ class CoinListViewModel(
 
                     _state.update { state ->
                         val currentTime = ZonedDateTime.now()
+                        val favoriteIds = favoritesRepository.getFavoriteCoins()
 
                         val updatedCoins = coins.map { coin ->
                             val previousCoin = state.coins.find { it.id == coin.id }
 
                             if (previousCoin?.priceUsd?.value == coin.priceUsd.toDisplayableNumber().value) {
-                                return@map previousCoin
+                                return@map previousCoin.copy(
+                                    isFavorite = favoriteIds.contains(coin.id)
+                                )
                             }
 
                             val updatedHistory = (previousCoin?.coinPriceHistory ?: emptyList())
                                 .filter { it.dateTime.isAfter(currentTime.minusMinutes(5)) }
                                 .plus(CoinPrice(priceUsd = coin.priceUsd, dateTime = currentTime))
 
-                            coin.toCoinUi().copy(coinPriceHistory = updatedHistory)
+                            coin.toCoinUi().copy(
+                                coinPriceHistory = updatedHistory,
+                                isFavorite = favoriteIds.contains(coin.id)
+                            )
                         }
 
                         val selectedCoin = state.selectedCoin?.let { selected ->
@@ -109,6 +125,7 @@ class CoinListViewModel(
         }
     }
 
+
     private fun selectCoin(coinUi: CoinUi) {
         Log.d("TAG", "selectCoin: #$coinUi")
         _state.update { it.copy(selectedCoin = coinUi) }
@@ -131,8 +148,23 @@ class CoinListViewModel(
             CoinFilter.TOP_GAINERS -> sortedByDescending { it.changePercent24Hr.value }
             CoinFilter.TOP_LOSERS -> sortedBy { it.changePercent24Hr.value }
             CoinFilter.HIGH_VOLUME -> filter { it.marketCapUsd.value > 1_000_000 }
-            CoinFilter.WATCHLIST -> filter { true }
+            CoinFilter.WATCHLIST -> filter { it.isFavorite }
             CoinFilter.ALL -> this
         }
+    }
+
+    private fun toggleFavoriteCoin(coinId: String) {
+        val currentFavorites = favoritesRepository.getFavoriteCoins().toMutableSet()
+        if (currentFavorites.contains(coinId)) {
+            currentFavorites.remove(coinId)
+        } else {
+            currentFavorites.add(coinId)
+        }
+        favoritesRepository.saveFavoriteCoins(currentFavorites)
+    }
+
+
+    fun isFavorite(coinId: String): Boolean {
+        return favoritesRepository.getFavoriteCoins().contains(coinId)
     }
 }

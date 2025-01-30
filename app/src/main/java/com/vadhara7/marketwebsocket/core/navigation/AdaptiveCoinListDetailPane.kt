@@ -74,7 +74,9 @@ fun AdaptiveCoinListDetailPane(
         },
         detailPane = {
             AnimatedPane {
-                CoinDetailScreen(state = state)
+                CoinDetailScreen(state = state, onAction = { action ->
+                    viewModel.onAction(action)
+                })
             }
         },
         modifier = modifier

@@ -5,6 +5,8 @@ import com.vadhara7.marketwebsocket.core.data.networking.HttpClientFactory
 import com.vadhara7.marketwebsocket.crypto.data.networking.WebSocketClient
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
 import com.vadhara7.marketwebsocket.crypto.data.networking.RemoteCoinDataSource
+import com.vadhara7.marketwebsocket.crypto.domain.FavoritesRepository
+import com.vadhara7.marketwebsocket.crypto.data.FavoritesRepositoryImpl
 import com.vadhara7.marketwebsocket.crypto.domain.WebSocketService
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.CoinListViewModel
 import io.ktor.client.engine.cio.CIO
@@ -17,6 +19,7 @@ val appModule = module {
     single { HttpClientFactory.create(CIO.create()) }
     singleOf(::RemoteCoinDataSource).bind<CoinDataSource>()
     singleOf(::WebSocketClient).bind<WebSocketService>()
+    singleOf(::FavoritesRepositoryImpl).bind<FavoritesRepository>()
 
     viewModelOf(::CoinListViewModel)
 }

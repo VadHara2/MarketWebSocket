@@ -8,7 +8,4 @@ import java.time.ZonedDateTime
 
 interface CoinDataSource {
     suspend fun getCoins(): Result<Flow<List<Coin>>, NetworkError>
-    suspend fun getCoinHistory(
-        coinId: String
-    ): Result<Flow<List<CoinPrice>>, NetworkError>
 }

@@ -5,6 +5,8 @@ import androidx.annotation.DrawableRes
 import com.vadhara7.marketwebsocket.crypto.domain.Coin
 import com.vadhara7.marketwebsocket.core.presentation.util.getDrawableIdForCoin
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.DataPoint
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 data class CoinUi(
@@ -16,13 +18,28 @@ data class CoinUi(
     val priceUsd: DisplayableNumber,
     val changePercent24Hr: DisplayableNumber,
     @DrawableRes val iconRes: Int,
-    val coinPriceHistory: List<DataPoint> = emptyList()
+    val coinPriceHistory: List<CoinPrice> = emptyList()
 )
 
 data class DisplayableNumber(
     val value: Double,
     val formatted: String
 )
+
+data class CoinPrice(
+    val priceUsd: Double,
+    val dateTime: ZonedDateTime
+){
+    fun toDataPoint(): DataPoint {
+        return DataPoint(
+            x = dateTime.hour.toFloat(),
+            y = priceUsd.toFloat(),
+            xLabel = DateTimeFormatter
+                .ofPattern("mm:ss")
+                .format(dateTime)
+        )
+    }
+}
 
 fun Coin.toCoinUi(): CoinUi {
     return CoinUi(

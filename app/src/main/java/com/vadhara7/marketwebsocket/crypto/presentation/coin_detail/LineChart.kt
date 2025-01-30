@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vadhara7.marketwebsocket.crypto.domain.CoinPrice
+import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinPrice
 import com.vadhara7.marketwebsocket.ui.theme.MarketWebSocketTheme
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.vadhara7.marketwebsocket.core.domain.util.onError
 import com.vadhara7.marketwebsocket.core.domain.util.onSuccess
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
-import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.DataPoint
+import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinPrice
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
 import com.vadhara7.marketwebsocket.crypto.presentation.models.toCoinUi
 import com.vadhara7.marketwebsocket.crypto.presentation.models.toDisplayableNumber
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
 
 class CoinListViewModel(
     private val coinDataSource: CoinDataSource
@@ -30,10 +30,7 @@ class CoinListViewModel(
 
     private val _state = MutableStateFlow(CoinListState())
     val state = _state
-        .onStart {
-            loadCoins()
-            _state.value.selectedCoin?.let { selectCoin(it) }
-        }
+        .onStart { loadCoins() }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(0),
@@ -47,94 +44,59 @@ class CoinListViewModel(
     private var historyJob: Job? = null
 
     fun onAction(action: CoinListAction) {
-        when (action) {
-            is CoinListAction.OnCoinClick -> {
-                selectCoin(action.coinUi)
-            }
+        if (action is CoinListAction.OnCoinClick) {
+            selectCoin(action.coinUi)
         }
     }
 
     private fun loadCoins() {
         coinsJob?.cancel()
-
         coinsJob = viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
+            _state.update { it.copy(isLoading = true) }
 
-            coinDataSource
-                .getCoins()
-                .onSuccess { coinsStateFlow ->
-                    coinsStateFlow.collectLatest { coins ->
-                        Log.d("TAG", "coinsStateFlow.collectLatest: $coins")
+            coinDataSource.getCoins().onSuccess { coinsStateFlow ->
+                coinsStateFlow.collectLatest { coins ->
+                    Log.d("TAG", "coinsStateFlow.collectLatest: $coins")
 
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                coins = coins.map { it.toCoinUi() }
-                            )
+                    _state.update { state ->
+                        val currentTime = ZonedDateTime.now()
+
+                        val updatedCoins = coins.map { coin ->
+                            val previousCoin = state.coins.find { it.id == coin.id }
+
+                            if (previousCoin?.priceUsd?.value == coin.priceUsd.toDisplayableNumber().value) {
+                                return@map previousCoin
+                            }
+
+                            val updatedHistory = (previousCoin?.coinPriceHistory ?: emptyList())
+                                .filter { it.dateTime.isAfter(currentTime.minusMinutes(5)) }
+                                .plus(CoinPrice(priceUsd = coin.priceUsd, dateTime = currentTime))
+
+                            coin.toCoinUi().copy(coinPriceHistory = updatedHistory)
                         }
-                    }
 
+                        val selectedCoin = state.selectedCoin?.let { selected ->
+                            updatedCoins.find { it.id == selected.id }
+                        }
+
+                        state.copy(
+                            isLoading = false,
+                            coins = updatedCoins,
+                            selectedCoin = selectedCoin
+                        )
+                    }
                 }
-                .onError { error ->
-                    _state.update { it.copy(isLoading = false) }
-                    _events.send(CoinListEvent.Error(error))
-                }
+            }.onError { error ->
+                _state.update { it.copy(isLoading = false) }
+                _events.send(CoinListEvent.Error(error))
+            }
         }
     }
 
     private fun selectCoin(coinUi: CoinUi) {
         Log.d("TAG", "selectCoin: #$coinUi")
-
-
         _state.update { it.copy(selectedCoin = coinUi) }
-
-        historyJob?.cancel()
-        historyJob = viewModelScope.launch {
-
-            coinDataSource
-                .getCoinHistory(
-                    coinId = coinUi.id
-                )
-                .onSuccess { history ->
-                    history.collectLatest { coinPrices ->
-                        Log.d("TAG", "history.collectLatest: $coinPrices")
-
-
-                        val dataPoints = coinPrices
-                            .sortedBy { it.dateTime }
-                            .map {
-                            DataPoint(
-                                x = it.dateTime.hour.toFloat(),
-                                y = it.priceUsd.toFloat(),
-                                xLabel = DateTimeFormatter
-                                    .ofPattern("mm:ss")
-                                    .format(it.dateTime)
-                            )
-                        }
-
-                        val combinePoints = _state.value.selectedCoin?.coinPriceHistory?.union(dataPoints)?.toSet()?.toList() ?: dataPoints
-
-                        _state.update {
-                            val updatedPrice = coinPrices.lastOrNull()?.priceUsd?.toDisplayableNumber() ?: coinUi.priceUsd
-                            val updatedCoin = it.selectedCoin?.copy(
-                                priceUsd = updatedPrice,
-                                coinPriceHistory = combinePoints
-                            )
-
-                            it.copy(selectedCoin = updatedCoin)
-                        }
-                    }
-                }
-                .onError { error ->
-                    _events.send(CoinListEvent.Error(error))
-                }
-        }
     }
-
 
     override fun onPause(owner: LifecycleOwner) {
         Log.d("TAG", "onPause")
@@ -147,5 +109,4 @@ class CoinListViewModel(
         coinsJob?.cancel()
         historyJob?.cancel()
     }
-
 }

@@ -152,7 +152,7 @@ fun CoinDetailScreen(
                 val startIndex = (coin.coinPriceHistory.lastIndex - amountOfVisibleDataPoints)
                     .coerceAtLeast(0)
                 LineChart(
-                    dataPoints = coin.coinPriceHistory,
+                    dataPoints = coin.coinPriceHistory.map { it.toDataPoint() },
                     style = ChartStyle(
                         chartLineColor = MaterialTheme.colorScheme.primary,
                         unselectedColor = MaterialTheme.colorScheme.secondary.copy(

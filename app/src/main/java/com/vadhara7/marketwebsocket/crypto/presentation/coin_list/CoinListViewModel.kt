@@ -8,10 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.vadhara7.marketwebsocket.core.domain.util.onError
 import com.vadhara7.marketwebsocket.core.domain.util.onSuccess
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
+import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.DataPoint
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
 import com.vadhara7.marketwebsocket.crypto.presentation.models.toCoinUi
 import com.vadhara7.marketwebsocket.crypto.presentation.models.toDisplayableNumber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class CoinListViewModel(
     private val coinDataSource: CoinDataSource
@@ -30,7 +30,10 @@ class CoinListViewModel(
 
     private val _state = MutableStateFlow(CoinListState())
     val state = _state
-        .onStart { loadCoins() }
+        .onStart {
+            loadCoins()
+            _state.value.selectedCoin?.let { selectCoin(it) }
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(0),
@@ -52,7 +55,7 @@ class CoinListViewModel(
     }
 
     private fun loadCoins() {
-        cancelJobs()
+        coinsJob?.cancel()
 
         coinsJob = viewModelScope.launch {
             _state.update {
@@ -84,38 +87,54 @@ class CoinListViewModel(
     }
 
     private fun selectCoin(coinUi: CoinUi) {
-        cancelJobs()
+        Log.d("TAG", "selectCoin: #$coinUi")
+
 
         _state.update { it.copy(selectedCoin = coinUi) }
 
+        historyJob?.cancel()
         historyJob = viewModelScope.launch {
+
             coinDataSource
                 .getCoinHistory(
-                    coinId = coinUi.id,
-                    start = ZonedDateTime.now().minusDays(5),
-                    end = ZonedDateTime.now()
+                    coinId = coinUi.id
                 )
                 .onSuccess { history ->
-
                     history.collectLatest { coinPrices ->
+                        Log.d("TAG", "history.collectLatest: $coinPrices")
 
-                        Log.d("TAG", "selectCoin: ${coinPrices.size}")
+
+                        val dataPoints = coinPrices
+                            .sortedBy { it.dateTime }
+                            .map {
+                            DataPoint(
+                                x = it.dateTime.hour.toFloat(),
+                                y = it.priceUsd.toFloat(),
+                                xLabel = DateTimeFormatter
+                                    .ofPattern("mm:ss")
+                                    .format(it.dateTime)
+                            )
+                        }
+
+                        val combinePoints = _state.value.selectedCoin?.coinPriceHistory?.union(dataPoints)?.toSet()?.toList() ?: dataPoints
+
                         _state.update {
-                            val updatedPrice = coinPrices.last().priceUsd.toDisplayableNumber()
-                            val updatedCoin = it.selectedCoin?.copy(priceUsd = updatedPrice)
+                            val updatedPrice = coinPrices.lastOrNull()?.priceUsd?.toDisplayableNumber() ?: coinUi.priceUsd
+                            val updatedCoin = it.selectedCoin?.copy(
+                                priceUsd = updatedPrice,
+                                coinPriceHistory = combinePoints
+                            )
 
                             it.copy(selectedCoin = updatedCoin)
                         }
-
                     }
-
                 }
                 .onError { error ->
                     _events.send(CoinListEvent.Error(error))
                 }
         }
-
     }
+
 
     override fun onPause(owner: LifecycleOwner) {
         Log.d("TAG", "onPause")
@@ -124,6 +143,7 @@ class CoinListViewModel(
     }
 
     private fun cancelJobs() {
+        Log.d("TAG", "cancelJobs")
         coinsJob?.cancel()
         historyJob?.cancel()
     }

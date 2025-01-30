@@ -4,6 +4,7 @@ import android.icu.text.NumberFormat
 import androidx.annotation.DrawableRes
 import com.vadhara7.marketwebsocket.crypto.domain.Coin
 import com.vadhara7.marketwebsocket.core.presentation.util.getDrawableIdForCoin
+import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.DataPoint
 import java.util.Locale
 
 data class CoinUi(
@@ -14,7 +15,8 @@ data class CoinUi(
     val marketCapUsd: DisplayableNumber,
     val priceUsd: DisplayableNumber,
     val changePercent24Hr: DisplayableNumber,
-    @DrawableRes val iconRes: Int
+    @DrawableRes val iconRes: Int,
+    val coinPriceHistory: List<DataPoint> = emptyList()
 )
 
 data class DisplayableNumber(

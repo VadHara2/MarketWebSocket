@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class CoinListViewModel(
     private val coinDataSource: CoinDataSource
@@ -44,8 +45,14 @@ class CoinListViewModel(
     private var historyJob: Job? = null
 
     fun onAction(action: CoinListAction) {
-        if (action is CoinListAction.OnCoinClick) {
-            selectCoin(action.coinUi)
+        when (action ) {
+            is CoinListAction.OnCoinClick -> selectCoin(action.coinUi)
+            is CoinListAction.OnIntervalChange -> {
+                _state.update {
+                    it.copy(refreshInterval = action.newInterval)
+                }
+                loadCoins()
+            }
         }
     }
 
@@ -54,7 +61,7 @@ class CoinListViewModel(
         coinsJob = viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            coinDataSource.getCoins().onSuccess { coinsStateFlow ->
+            coinDataSource.getCoins(_state.value.refreshInterval).onSuccess { coinsStateFlow ->
                 coinsStateFlow.collectLatest { coins ->
                     Log.d("TAG", "coinsStateFlow.collectLatest: $coins")
 
@@ -82,7 +89,10 @@ class CoinListViewModel(
                         state.copy(
                             isLoading = false,
                             coins = updatedCoins,
-                            selectedCoin = selectedCoin
+                            selectedCoin = selectedCoin,
+                            lastUpdated = DateTimeFormatter
+                                .ofPattern("HH:mm:ss")
+                                .format(currentTime)
                         )
                     }
                 }

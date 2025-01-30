@@ -66,6 +66,7 @@ fun AdaptiveCoinListDetailPane(
                                     pane = ListDetailPaneScaffoldRole.Detail
                                 )
                             }
+                            else -> { }
                         }
                     }
                 )

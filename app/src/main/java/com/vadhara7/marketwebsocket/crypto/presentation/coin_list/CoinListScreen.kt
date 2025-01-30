@@ -22,7 +22,8 @@ import com.vadhara7.marketwebsocket.ui.theme.MarketWebSocketTheme
 @Composable
 fun CoinListScreen(
     state: CoinListState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAction: (CoinListAction) -> Unit
 ) {
     if(state.isLoading) {
         Box(
@@ -41,7 +42,7 @@ fun CoinListScreen(
             items(state.coins) { coinUi ->
                 CoinListItem(
                     coinUi = coinUi,
-                    onClick = { /*TODO*/ },
+                    onClick = { onAction(CoinListAction.OnCoinClick(coinUi)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 HorizontalDivider()
@@ -61,7 +62,8 @@ private fun CoinListScreenPreview() {
                 }
             ),
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
+            onAction = {}
         )
     }
 }

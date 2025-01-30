@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vadhara7.marketwebsocket.core.presentation.util.ObserveAsEvents
 import com.vadhara7.marketwebsocket.core.presentation.util.toString
+import com.vadhara7.marketwebsocket.crypto.presentation.coin_detail.CoinDetailScreen
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.CoinListEvent
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.CoinListScreen
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.CoinListViewModel
@@ -47,10 +48,21 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    CoinListScreen(
-                        state = state,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    when {
+                        state.selectedCoin != null -> {
+                            CoinDetailScreen(
+                                state = state,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        else -> {
+                            CoinListScreen(
+                                state = state,
+                                modifier = Modifier.padding(innerPadding),
+                                onAction = viewModel::onAction
+                            )
+                        }
+                    }
                 }
             }
         }

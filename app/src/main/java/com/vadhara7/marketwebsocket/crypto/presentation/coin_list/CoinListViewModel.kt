@@ -1,5 +1,6 @@
 package com.vadhara7.marketwebsocket.crypto.presentation.coin_list
 
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -39,7 +40,7 @@ class CoinListViewModel(
     fun onAction(action: CoinListAction) {
         when(action) {
             is CoinListAction.OnCoinClick -> {
-
+                _state.update { it.copy(selectedCoin = action.coinUi) }
             }
         }
     }
@@ -47,7 +48,7 @@ class CoinListViewModel(
     private fun loadCoins() {
         coinsJob = viewModelScope.launch {
             coinDataSource.getCoins().collect { result ->
-
+                Log.d("TAG", "loadCoins: $result")
                 result.onSuccess { coins ->
 
                     _state.update { it.copy(
@@ -66,6 +67,7 @@ class CoinListViewModel(
     }
 
     override fun onPause(owner: LifecycleOwner) {
+        Log.d("TAG", "onPause")
         coinsJob?.cancel()
         super.onPause(owner)
     }

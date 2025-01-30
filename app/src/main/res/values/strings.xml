@@ -8,4 +8,7 @@
     <string name="market_cap">Market Cap</string>
     <string name="price">Price</string>
     <string name="change_last_24h">Change last 24h</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="refresh_interval">Refresh: %1$d s</string>
+    <string name="interval_sec">%1$d sec</string>
 </resources>

@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.vadhara7.marketwebsocket.R
 
 @Composable
 fun DropdownMenuButton(selectedInterval: Int, onIntervalChange: (Int) -> Unit) {
@@ -20,12 +22,12 @@ fun DropdownMenuButton(selectedInterval: Int, onIntervalChange: (Int) -> Unit) {
 
     Box(modifier = Modifier.wrapContentSize()) {
         Button(onClick = { expanded = true }) {
-            Text("Refresh: ${selectedInterval}s")
+            Text(stringResource(R.string.refresh_interval, selectedInterval))
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             intervals.forEach { interval ->
                 DropdownMenuItem(
-                    text = { Text("$interval sec") },
+                    text = { Text(stringResource(R.string.interval_sec, interval)) },
                     onClick = {
                         onIntervalChange(interval)
                         expanded = false

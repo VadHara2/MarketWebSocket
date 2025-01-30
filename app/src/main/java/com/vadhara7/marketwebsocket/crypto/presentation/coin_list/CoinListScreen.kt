@@ -29,10 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vadhara7.marketwebsocket.R
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.CoinListItem
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.DropdownMenuButton
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.previewCoin
@@ -60,7 +62,7 @@ fun CoinListScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Last updated: ${state.lastUpdated ?: "N/A"}",
+                text = stringResource(R.string.last_updated, state.lastUpdated ?: "N/A"),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = contentColor

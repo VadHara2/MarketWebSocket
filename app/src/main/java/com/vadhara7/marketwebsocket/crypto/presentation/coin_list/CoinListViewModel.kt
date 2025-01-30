@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vadhara7.marketwebsocket.core.domain.util.onError
 import com.vadhara7.marketwebsocket.core.domain.util.onSuccess
+import com.vadhara7.marketwebsocket.core.presentation.util.CoinFilter
 import com.vadhara7.marketwebsocket.crypto.domain.CoinDataSource
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinPrice
 import com.vadhara7.marketwebsocket.crypto.presentation.models.CoinUi
@@ -53,6 +54,11 @@ class CoinListViewModel(
                 }
                 loadCoins()
             }
+            is CoinListAction.OnFilterSelect -> {
+                _state.update {
+                    it.copy(selectedFilter = action.filter, coins = it.coins.applyFilters(action.filter))
+                }
+            }
         }
     }
 
@@ -88,7 +94,7 @@ class CoinListViewModel(
 
                         state.copy(
                             isLoading = false,
-                            coins = updatedCoins,
+                            coins = updatedCoins.applyFilters(state.selectedFilter),
                             selectedCoin = selectedCoin,
                             lastUpdated = DateTimeFormatter
                                 .ofPattern("HH:mm:ss")
@@ -118,5 +124,15 @@ class CoinListViewModel(
         Log.d("TAG", "cancelJobs")
         coinsJob?.cancel()
         historyJob?.cancel()
+    }
+
+    private fun List<CoinUi>.applyFilters(filter: CoinFilter): List<CoinUi> {
+        return when (filter) {
+            CoinFilter.TOP_GAINERS -> sortedByDescending { it.changePercent24Hr.value }
+            CoinFilter.TOP_LOSERS -> sortedBy { it.changePercent24Hr.value }
+            CoinFilter.HIGH_VOLUME -> filter { it.marketCapUsd.value > 1_000_000 }
+            CoinFilter.WATCHLIST -> filter { true }
+            CoinFilter.ALL -> this
+        }
     }
 }

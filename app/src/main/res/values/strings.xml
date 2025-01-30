@@ -11,4 +11,5 @@
     <string name="last_updated">Last updated: %1$s</string>
     <string name="refresh_interval">Refresh: %1$d s</string>
     <string name="interval_sec">%1$d sec</string>
+    <string name="filter">Filter: %1$s</string>
 </resources>

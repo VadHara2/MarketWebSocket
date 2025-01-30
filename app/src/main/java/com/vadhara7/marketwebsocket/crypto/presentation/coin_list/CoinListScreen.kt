@@ -31,12 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vadhara7.marketwebsocket.R
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.CoinListItem
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.DropdownMenuButton
+import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.FilterDropdown
 import com.vadhara7.marketwebsocket.crypto.presentation.coin_list.components.previewCoin
 import com.vadhara7.marketwebsocket.ui.theme.MarketWebSocketTheme
 
@@ -47,7 +49,7 @@ fun CoinListScreen(
     onAction: (CoinListAction) -> Unit,
     listState: LazyListState
 ) {
-    val contentColor = if(isSystemInDarkTheme()) {
+    val contentColor = if (isSystemInDarkTheme()) {
         Color.White
     } else {
         Color.Black
@@ -61,19 +63,28 @@ fun CoinListScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.last_updated, state.lastUpdated ?: "N/A"),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = contentColor
-            )
+
             DropdownMenuButton(
                 selectedInterval = state.refreshInterval,
                 onIntervalChange = { newInterval ->
                     onAction(CoinListAction.OnIntervalChange(newInterval))
                 }
             )
+            FilterDropdown(
+                selectedFilter = state.selectedFilter,
+                onFilterSelected = { newFilter -> onAction(CoinListAction.OnFilterSelect(newFilter)) }
+            )
         }
+
+        Text(
+            text = stringResource(R.string.last_updated, state.lastUpdated ?: "N/A"),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = contentColor,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+
 
         if (state.isLoading) {
             Box(

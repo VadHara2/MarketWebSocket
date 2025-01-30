@@ -29,7 +29,21 @@ class RemoteCoinDataSource(
                 .sample(refreshInterval.seconds)
                 .scan(initialCoinsMap) { currentCoins, priceMap ->
                     currentCoins.mapValues { (id, coin) ->
-                        coin.copy(priceUsd = priceMap[id]?.toDouble() ?: coin.priceUsd)
+                        val newPrice = priceMap[id]?.toDouble() ?: coin.priceUsd
+
+                        val price24HrAgo = if (coin.changePercent24Hr != 0.0) {
+                            coin.priceUsd / (1 + coin.changePercent24Hr / 100)
+                        } else {
+                            coin.priceUsd
+                        }
+
+                        val updatedChangePercent24Hr = if (price24HrAgo != 0.0) {
+                            ((newPrice - price24HrAgo) / price24HrAgo) * 100
+                        } else {
+                            0.0
+                        }
+
+                        coin.copy(priceUsd = newPrice, changePercent24Hr = updatedChangePercent24Hr)
                     }
                 }
                 .map { it.values.toList() }

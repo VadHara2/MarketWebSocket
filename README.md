@@ -5,9 +5,9 @@
 ---
 ## Скріншоти
 
-![](screenshot/Screenshot_1)
+![](screenshot/Screenshot_1.png)
 
-![](screenshot/Screenshot_2)
+![](screenshot/Screenshot_2.png)
 
 ## **Функціональність**
 
